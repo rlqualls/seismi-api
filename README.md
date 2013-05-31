@@ -1,19 +1,33 @@
-= seismi-api
+seismi-api 
+========== 
 
-== Description
+Description 
+-----------
 
-seismi-api is a library for interacting with the seismi.org api, which
-returns information about earthquakes.
+seismi-api is a library for interacting with the seismi.org API, which 
+returns information about earthquakes. 
 
-== Installation
+Installation 
+------------ 
 
-TODO: INSTALLATION
+TODO: INSTALLATION 
 
-== Examples
+Examples 
+-------- 
 
-TODO: EXAMPLES
+  client = Seismi::API::Client.new 
+  client.yearly_total(2011) 
+  client.monthly_total(2009, 11) 
 
-== Copyright
+  client.during_year(2013).each do |quake| 
+    puts "#{quake.timedate}: #{quake.magnitude}" 
+  end 
+
+  client.during_month(2009, 11).each do |quake| 
+    puts "#{quake.lat}, #{quake.lon}" 
+
+Copyright 
+---------
 
 Copyright (c) 2013 Robert Qualls. See LICENSE.txt for
 further details.
