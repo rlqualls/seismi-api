@@ -1,4 +1,5 @@
 require 'curb'
+require 'cgi'
 require 'json'
 
 module Seismi
@@ -21,30 +22,38 @@ module Seismi
         @cache[uri] = JSON.parse(response)
       end
 
-      def during_year(year)
-        hash = get_hash(EQS_URI + "/#{year}")
+      def where(options = {})
+        hash = get_hash(EQS_URI)
+        options.keys.each do |key, value|
+          selected_quakes += hash.select { |quake| quake["key"] == value }
+        end  
+      end
+
+      def during(options = {})
+        # params = options.reject { |k| k != :limit && k != :min_magnitude }
+        # uri = EQS_URI + to_query(params)
+        if year = options[:year] && month = options[:month]
+          hash = get_hash(EQS_URI + "/#{year}/#{month}")
+        elsif year = options[:year]
+          hash = get_hash(EQS_URI + "/#{year}")
+        end 
         hash["earthquakes"].collect do |q|
           Earthquake.new(q["src"], q["eqid"], q["timedate"], q["lat"],
                          q["lon"], q["magnitude"], q["depth"], q["region"])
         end
       end
 
-      def during_month(year, month)
-        hash = get_hash(EQS_URI + "/#{year}/#{month}")
-        hash["earthquakes"].collect do |q|
-          Earthquake.new(q["src"], q["eqid"], q["timedate"], q["lat"],
-                         q["lon"], q["magnitude"], q["depth"], q["region"])
+      def total(options = {})
+        totals = get_hash(TOTALS_URI)
+        if year = options[:year] && month = options[:month]
+          total = totals["#{year}.#{month}"].to_i
+        elsif year = options[:year]
+          total = totals["#{year}"].to_i
         end
       end
 
-      def monthly_total(year, month)
-        totals = get_hash(TOTALS_URI)
-        total = totals["#{year}.#{month}"].to_i
-      end
-
-      def yearly_total(year)
-        totals = get_hash(TOTALS_URI)
-        total = totals["#{year}"].to_i
+      def to_query(params)
+        "?" + params.map { |k ,v| "#{k}=#{CGI::escape v}" }.join("&")
       end
     end
 

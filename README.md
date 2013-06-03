@@ -16,14 +16,14 @@ Examples
 -------- 
 
     client = Seismi::API::Client.new 
-    client.yearly_total(2011) 
-    client.monthly_total(2009, 11) 
+    client.total(year: 2011) 
+    client.total(year: 2009, month: 11) 
 
-    client.during_year(2013).each do |quake| 
+    client.during(2013).each do |quake| 
       puts "#{quake.timedate}: #{quake.magnitude}" 
     end 
 
-    client.during_month(2009, 11).each do |quake| 
+    client.during(2009, 11).each do |quake| 
       puts "#{quake.lat}, #{quake.lon}" 
 
 Copyright 
